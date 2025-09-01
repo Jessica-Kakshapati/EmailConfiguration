@@ -1,42 +1,44 @@
-post {
-    success {
-        emailext (
-            subject: "Build #${BUILD_NUMBER} - ${JOB_NAME} - SUCCESS",
-            body: """
-            Hello,
+pipeline {
+    agent any
 
-            The Jenkins pipeline has completed successfully.
-            Job: ${JOB_NAME}
-            Build Number: ${BUILD_NUMBER}
-            Status: SUCCESS
+    stages {
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/Jessica-Kakshapati/EmailConfiguration', branch: 'main'
+            }
+        }
 
-            Please find the build log attached.
-
-            Regards,
-            Jenkins
-            """,
-            to: "jessikakshapati@gmail.com",
-            attachLog: true
-        )
+        stage('Test Email') {
+            steps {
+                echo "Running test build..."
+            }
+        }
     }
-    failure {
-        emailext (
-            subject: "Build #${BUILD_NUMBER} - ${JOB_NAME} - FAILED",
-            body: """
-            Hello,
 
-            The Jenkins pipeline has failed.
-            Job: ${JOB_NAME}
-            Build Number: ${BUILD_NUMBER}
-            Status: FAILED
-
-            Please review the attached build log.
-
-            Regards,
-            Jenkins
-            """,
-            to: "jessikakshapati@gmail.com",
-            attachLog: true
-        )
+    post {
+        success {
+            emailext (
+                subject: "Build #${BUILD_NUMBER} - ${JOB_NAME} - SUCCESS",
+                body: """
+                Jenkins pipeline completed successfully.
+                Job: ${JOB_NAME}
+                Build Number: ${BUILD_NUMBER}
+                """,
+                to: "jessikakshapati@gmail.com",
+                attachLog: true
+            )
+        }
+        failure {
+            emailext (
+                subject: "Build #${BUILD_NUMBER} - ${JOB_NAME} - FAILED",
+                body: """
+                Jenkins pipeline has failed.
+                Job: ${JOB_NAME}
+                Build Number: ${BUILD_NUMBER}
+                """,
+                to: "jessikakshapati@gmail.com",
+                attachLog: true
+            )
+        }
     }
 }
