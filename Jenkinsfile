@@ -1,37 +1,42 @@
-pipeline {
-    agent any
+post {
+    success {
+        emailext (
+            subject: "Build #${BUILD_NUMBER} - ${JOB_NAME} - SUCCESS",
+            body: """
+            Hello,
 
-    stages {
-        stage('Test Email') {
-            steps {
-                echo 'Running test build...'
-            }
-        }
+            The Jenkins pipeline has completed successfully.
+            Job: ${JOB_NAME}
+            Build Number: ${BUILD_NUMBER}
+            Status: SUCCESS
+
+            Please find the build log attached.
+
+            Regards,
+            Jenkins
+            """,
+            to: "jessikakshapati@gmail.com",
+            attachLog: true
+        )
     }
+    failure {
+        emailext (
+            subject: "Build #${BUILD_NUMBER} - ${JOB_NAME} - FAILED",
+            body: """
+            Hello,
 
-    post {
-        success {
-            emailext(
-                to: 'jessikakshapati@gmail.com',
-                subject: "SUCCESS: Jenkins Build #${env.BUILD_NUMBER}",
-                body: """\
-                ✅ Test Build #${env.BUILD_NUMBER} succeeded!
-                Job: ${env.JOB_NAME}
-                Console log: ${env.BUILD_URL}console
-                """
-            )
-        }
+            The Jenkins pipeline has failed.
+            Job: ${JOB_NAME}
+            Build Number: ${BUILD_NUMBER}
+            Status: FAILED
 
-        failure {
-            emailext(
-                to: 'jessikakshapati@gmail.com',
-                subject: "FAILURE: Jenkins Build #${env.BUILD_NUMBER}",
-                body: """\
-                ❌ Test Build #${env.BUILD_NUMBER} failed!
-                Job: ${env.JOB_NAME}
-                Console log: ${env.BUILD_URL}console
-                """
-            )
-        }
+            Please review the attached build log.
+
+            Regards,
+            Jenkins
+            """,
+            to: "jessikakshapati@gmail.com",
+            attachLog: true
+        )
     }
 }
